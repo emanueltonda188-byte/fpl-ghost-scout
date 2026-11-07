@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FPL Ghost Scout 👻 — Find the hidden gems</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <!-- Friendly ghost that drifts across the page all the time.
+       Two nested divs: the outer drifts left-right, the inner bobs up-down.
+       It is behind the content (z-index) and clicks pass through it, so it
+       never covers buttons or text. See styles.css for the animation. -->
+  <div class="ghost-drift" aria-hidden="true"><div class="ghost-bob">👻</div></div>
+
+  <!-- Top of the page: ghost mascot, title, and live/sample badge -->
+  <header class="top-bar">
+    <div class="ghost" aria-hidden="true">👻</div>
+    <div>
+      <h1>FPL Ghost Scout</h1>
+      <p class="tagline">Find the hidden gems. Plain-words FPL help, no stats jargon.</p>
+    </div>
+    <span id="data-badge" class="badge">Showing sample data</span>
+  </header>
+
+  <!-- Simple tabs: one page, switch sections -->
+  <nav class="tabs">
+    <button class="tab active" data-tab="dashboard">Dashboard</button>
+    <button class="tab" data-tab="scout">Ghost Scout</button>
+    <button class="tab" data-tab="players">Players</button>
+    <button class="tab" data-tab="fixtures">Fixtures</button>
+    <button class="tab" data-tab="team">My Team</button>
+    <button class="tab" data-tab="chat">Ghost Chat 💬</button>
+  </nav>
+
+  <main>
+
+    <!-- DASHBOARD -->
+    <section id="tab-dashboard" class="panel active">
+      <h2>Dashboard</h2>
+
+      <div class="countdown-box">
+        <p class="countdown-label">Next deadline — Gameweek 11</p>
+        <p id="countdown" class="countdown">Loading countdown…</p>
+        <p class="small">Saturday 21 November 2026, 2:00pm EAT (11:00 GMT). Gameweek 10 is running now.</p>
+      </div>
+
+      <!-- Account details box. Shows the user's saved FPL team info as soon as
+           it is known. Empty until a team ID is entered and fetched OK. -->
+      <div id="account-box" class="account-box" style="display:none">
+        <p class="account-label">👤 Your account</p>
+        <p id="account-detail" class="account-detail">—</p>
+      </div>
+
+      <div class="cards">
+        <div class="card orange">
+          <p class="card-label">👑 Top Scorer</p>
+          <p id="top-scorer" class="card-player">—</p>
+          <p id="top-scorer-detail" class="card-detail">—</p>
+        </div>
+        <div class="card green">
+          <p class="card-label">🔥 Best Form</p>
+          <p id="best-form" class="card-player">—</p>
+          <p id="best-form-detail" class="card-detail">—</p>
+        </div>
+        <div class="card pink">
+          <p class="card-label">💎 Best Value</p>
+          <p id="best-value" class="card-player">—</p>
+          <p id="best-value-detail" class="card-detail">—</p>
+        </div>
+      </div>
+
+      <h3>Plain-words tips for Gameweek 11</h3>
+      <ul id="tips-list" class="tips"></ul>
+
+      <h3>Top form players</h3>
+      <div id="top-players" class="player-list"></div>
+    </section>
+
+    <!-- GHOST SCOUT -->
+    <section id="tab-scout" class="panel">
+      <h2>Ghost Scout 👻</h2>
+      <p>Undervalued players flying under the radar. Adjust the filters to uncover hidden gems.</p>
+
+      <div class="filters">
+        <label>Position
+          <select id="filter-position">
+            <option value="all">All</option>
+            <option value="GK">Goalkeeper</option>
+            <option value="DEF">Defender</option>
+            <option value="MID">Midfielder</option>
+            <option value="FWD">Forward</option>
+          </select>
+        </label>
+        <label>Max price (£m)
+          <input id="filter-price" type="number" value="8" min="4" max="16" step="0.5">
+        </label>
+        <label>Sort by
+          <select id="filter-sort">
+            <option value="points">Total points</option>
+            <option value="form">Form</option>
+            <option value="value">Points per £1m</option>
+          </select>
+        </label>
+        <button id="filter-button" class="button">Find gems 💎</button>
+      </div>
+
+      <div id="scout-results" class="player-list"></div>
+    </section>
+
+    <!-- PLAYERS -->
+    <section id="tab-players" class="panel">
+      <h2>Players</h2>
+      <input id="player-search" type="search" placeholder="Search a player, e.g. Haaland…" class="search-box">
+      <div id="all-players" class="player-list"></div>
+    </section>
+
+    <!-- FIXTURES -->
+    <section id="tab-fixtures" class="panel">
+      <h2>Upcoming Fixtures</h2>
+      <p class="small">Next Gameweek: Gameweek 11. Fixtures below are the sample set — live fixtures load when the FPL data loads.</p>
+      <div id="fixtures-list" class="fixture-list"></div>
+    </section>
+
+    <!-- MY TEAM -->
+    <section id="tab-team" class="panel">
+      <h2>My Team</h2>
+      <p>Type your FPL team ID and see your players. Your team ID is the number in your FPL Points page address, after <code>/entry/</code>.</p>
+      <div class="team-box">
+        <input id="team-id" type="number" placeholder="Your FPL team ID, e.g. 1234567" class="search-box">
+        <button id="team-button" class="button">Show my team</button>
+      </div>
+      <p id="team-message" class="small"></p>
+      <div id="my-team" class="player-list"></div>
+
+      <h3>Example team — TEE</h3>
+      <p class="small">Your October: 453 points in total, best week Gameweek 7 with 81 points. Top October scorers: Ezri Konsa 37, Evanilson 34, Gabriel 33.</p>
+    </section>
+
+    <!-- GHOST CHAT
+         This is the gameweek chat. You type a display name and a message,
+         press Send (or Enter), and your message appears. Open the page in
+         two browser tabs and the two of you can chat live — messages sync
+         through the browser's storage. If you set up Supabase (see app.js
+         and README.md), everyone online can see each other's messages. -->
+    <section id="tab-chat" class="panel">
+      <h2>Ghost Chat 💬</h2>
+      <p class="small">Chat with other FPL ghosts. Type a display name, then a message. Keep it friendly, max 200 characters per message.</p>
+      <p id="chat-note" class="small"></p>
+
+      <div class="chat-box">
+        <input id="chat-name" type="text" placeholder="Your display name" maxlength="20">
+        <input id="chat-message" type="text" placeholder="Type a message…" maxlength="200">
+        <button id="chat-button" class="button">Send 👻</button>
+      </div>
+
+      <div id="chat-messages" class="chat-messages"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>👻 FPL Ghost Scout — built for Kiroween 2026, Frankenstein category. Data: Fantasy Premier League (live when it loads, sample data when it cannot). Not affiliated with the Premier League.</p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
